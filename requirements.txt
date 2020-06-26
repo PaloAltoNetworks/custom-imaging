@@ -1,0 +1,3 @@
+paramiko==2.7.1
+boto3==1.12.14
+PyYAML==5.3
