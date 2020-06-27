@@ -42,8 +42,8 @@ Create custom VM-Series images on public cloud with upgraded PanOS, Plugin and C
 | delicensing-api-key | optional | Delicensing API key. Not required for Bundle1 and Bundle2 AMIs. Required for BYOL AMI only. | delicensing-api-key: '6*********************d' # For BYOL <br/>delicensing-api-key: false # For Bundle/PAYG Deployment Only|
 | vm-series-plugin-version | optional | Desired VM-Series Plugin version | vm-series-plugin-version: 'vm_series-1.0.11’ <br/>vm-series-plugin-version: false  # For not upgrading the plugin |
 | software-version | mandatory | Desired PanOS version | software-version: 'PanOSXFR_vm-9.0.5.xfr’ <br/>software-version: 'PanOS_vm-9.1.2' |
-| content-upgrade | optional | Boolean Value | content-version: true # To upgrade content <br/>content-version: false # To not upgrade content |
-| antivirus-upgrade | optional | Boolean Value | antivirus-version: true # To upgrade Anti-Virus <br/>antivirus-version: false # To not upgrade Anti-Virus
+| content-upgrade | optional | Boolean Value | content-upgrade: true # To upgrade content <br/>content-upgrade: false # To not upgrade content |
+| antivirus-upgrade | optional | Boolean Value | antivirus-upgrade: true # To upgrade Anti-Virus <br/>antivirus-upgrade: false # To not upgrade Anti-Virus
 | global-protect-cvpn-upgrade | optional | Boolean Value | global-protect-cvpn-upgrade: true # To upgrade Global-Protect Clientless-VPN <br/>global-protect-cvpn-upgrade: false # To not upgrade Global-Protect Clientless-VPN |
 | wildfire-upgrade | optional | Boolean Value | wildfire-upgrade: true # To upgrade Wildfire <br/>wildfire-upgrade: false # To not upgrade Wildfire
   
