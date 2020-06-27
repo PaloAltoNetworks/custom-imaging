@@ -46,6 +46,14 @@ class CloudAws(object):
         self.logger.info(f'*** Creating Instance ***')
         try:
             instance_request = self.resource.create_instances(
+                BlockDeviceMappings=[
+                    {
+                        'DeviceName': '/dev/xvda',
+                        'Ebs': {
+                            'DeleteOnTermination': True,
+                        }
+                    }
+                ],
                 ImageId=ami_id,
                 MinCount=1,
                 MaxCount=1,
