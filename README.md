@@ -1,6 +1,10 @@
 # Custom Imaging
 Create custom VM-Series images on public cloud with upgraded PanOS, Plugin and Content versions
 
+## Support Policy
+The code and script in the repo are released under an as-is, best effort, support policy. These scripts should be seen as community supported and Palo Alto Networks will contribute our expertise as and when possible. We do not provide technical support or help in using or troubleshooting the components of the project through our normal support options such as Palo Alto Networks support teams, or ASC (Authorized Support Centers) partners and backline support options. The underlying product used (the VM-Series firewall) by the scripts are still supported, but the support is only for the product functionality and not for help in deploying or using the script itself.
+Unless explicitly tagged, all projects or work posted in our GitHub repository (at https://github.com/PaloAltoNetworks) or sites other than our official Downloads page on https://support.paloaltonetworks.com are provided under the best effort policy.
+
 ## AWS Custom AMI
 #### Notes:
   - Only upgrades among major releases are supported. For example, upgrade from **9.0**.1 to **9.0**.6 is supported, upgrade from **8.1**.4 to **9.0**.6 is not supported.
