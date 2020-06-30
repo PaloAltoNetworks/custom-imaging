@@ -1,0 +1,29 @@
+########################################
+############## AWS CONFIG ##############
+########################################
+
+secret-key-id: 'A***H'
+secret-access-key: 'B***3'
+region: 'us-west-1'
+
+ami-id: 'ami-xxxx'
+mgmt-subnet-id: 'subnet-xxxx'
+sg-id: 'sg-xxxx'
+instance-type: 'm5.xlarge'
+key-pair-name: 'key-pair-name'
+instance-pkey: '/path/to/directory/customami/private_key.pem'
+auth-code: 'I0000009'               # false for PAYG/Bundle 1 and Bundle 2
+delicensing-api-key: '6********d'   # false for PAYG/Bundle 1 and Bundle 2
+
+########################################
+############## CUSTOM AMI ##############
+########################################
+
+vm-series-plugin-version: 'vm_series-1.0.11' # false for not upgrading
+software-version: 'PanOS_vm-9.1.2'  # 'PanOS_vm-9.1.2-h1' / 'PanOSXFR_vm-9.0.5.xfr' / 'PanOS_vm-9.0.6'
+content-upgrade: true   # false for not upgrading
+antivirus-upgrade: true # false for not upgrading
+global-protect-cvpn-upgrade: true # false for not upgrading
+wildfire-upgrade: true # false for not upgrading
+
+########################################
