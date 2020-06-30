@@ -24,9 +24,6 @@ def main():
         # Verify System
         lib.verify_system()
 
-        # Upgrade VM Series Plugin
-        lib.upgrade_plugin()
-
         # Upgrade Content
         lib.upgrade_content()
 
@@ -38,6 +35,9 @@ def main():
 
         # Upgrade Wildfire
         lib.upgrade_wildfire()
+
+        # Upgrade VM Series Plugin
+        lib.upgrade_plugin()
 
         # Upgrade PanOS
         lib.upgrade_panos()
