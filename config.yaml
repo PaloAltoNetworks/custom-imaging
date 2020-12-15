@@ -1,6 +1,13 @@
 ########################################
+########### CLOUD SELECTION ############
+########################################
+
+cloud-provider: ""                 # "azure"/"aws"/"gcp"
+
+########################################
 ############## AWS CONFIG ##############
 ########################################
+# Leave this block as default if you are not using this script for AWS
 
 secret-key-id: 'A***H'
 secret-access-key: 'B***3'
@@ -12,18 +19,41 @@ sg-id: 'sg-xxxx'
 instance-type: 'm5.xlarge'
 key-pair-name: 'key-pair-name'
 instance-pkey: '/path/to/directory/customami/private_key.pem'
-auth-code: 'I0000009'               # false for PAYG/Bundle 1 and Bundle 2
-delicensing-api-key: '6********d'   # false for PAYG/Bundle 1 and Bundle 2
+
+########################################
+############# AZURE CONFIG #############
+########################################
+# Leave this block as default if you are not using this script for Azure
+
+subscription-id: "xxxx"
+tenant-id: "xxxx"
+client-id: "xxxx"
+client-secret: "xxxx"
+
+location: "westus"
+rg-name: ""
+vm-size: "Standard_DS4_v2"
+nic-id: "/subscriptions/<subscription-id>/resourceGroups/<rg-name>/providers/Microsoft.Network/networkInterfaces/<ni-name>"
+
+image-sku: "byol"
+image-version: "10.0.2"
+
+########################################
+############ Licensing Info ############
+########################################
+
+auth-code: 'I0000009'                   # false for PAYG/Bundle 1 and Bundle 2
+delicensing-api-key: '6********d'       # false for PAYG/Bundle 1 and Bundle 2
 
 ########################################
 ############## CUSTOM AMI ##############
 ########################################
 
-vm-series-plugin-version: 'vm_series-1.0.11' # false for not upgrading
-software-version: 'PanOS_vm-9.1.2'  # 'PanOS_vm-9.1.2-h1' / 'PanOSXFR_vm-9.0.5.xfr' / 'PanOS_vm-9.0.6'
-content-upgrade: true   # false for not upgrading
-antivirus-upgrade: true # false for not upgrading
-global-protect-cvpn-upgrade: true # false for not upgrading
-wildfire-upgrade: true # false for not upgrading
+vm-series-plugin-version: 'vm_series-2.0.3' # false for not upgrading
+software-version: 'PanOS_vm-10.0.3'      # 'PanOS_vm-9.1.2-h1' / 'PanOSXFR_vm-9.0.5.xfr' / 'PanOS_vm-9.0.6'
+content-upgrade: true                   # false for not upgrading
+antivirus-upgrade: true                 # false for not upgrading
+global-protect-cvpn-upgrade: true       # false for not upgrading
+wildfire-upgrade: true                  # false for not upgrading
 
 ########################################

@@ -31,12 +31,20 @@ class PanosDevice(object):
         self.host = kwargs.get('host')
         self.connected = 0
         self.logger = logger
+        pkey = kwargs.get('ssh_key_file', None)
+        password = kwargs.get('password', None)
         try:
             logger.info(f'*** Connecting to device {self.host} ***')
-            self.handle = Handle(logger,
-                                 host=self.host,
-                                 user=kwargs['user'],
-                                 ssh_key_file=kwargs['ssh_key_file'])
+            if pkey:
+                self.handle = Handle(logger,
+                                     host=self.host,
+                                     user=kwargs['user'],
+                                     ssh_key_file=pkey)
+            else:
+                self.handle = Handle(logger,
+                                     host=self.host,
+                                     user=kwargs['user'],
+                                     password=password)
         except ConnectionError:
             raise Exception("Cannot connect to Device %s" % self.host)
         self.connected = 1
@@ -121,7 +129,7 @@ class PanosDevice(object):
             self.logger.info('*** No API Key provided. De-licensing skipped ***')
         return
 
-    def private_data_reset(self):
+    def private_data_reset(self, cloud_provider):
         try:
             self.exec(command='request system private-data-reset', pattern=['NOW!', 'Broadcast message from root'])
         except Exception as e:
@@ -133,11 +141,18 @@ class PanosDevice(object):
         self.logger.info("Waiting for the device to restart...")
         time.sleep(RESTART)
         try:
-            self.__init__(self.logger, **self._kwargs)
+            if cloud_provider.lower() == "azure":
+                time.sleep(RETRY)
+            else:
+                self.__init__(self.logger, **self._kwargs)
         except:
             self.logger.info('Unable to connect via ssh. Waiting for 2 minutes before retrying.')
             time.sleep(RETRY)
-            self.__init__(self.logger, **self._kwargs)
+            if cloud_provider.lower() == "azure":
+                self.logger.info("*** Reboot after Private Data Reset Complete ***")
+                return
+            else:
+                self.__init__(self.logger, **self._kwargs)
 
     def config(self, **kwargs):
         exec_prompt = self.prompt
@@ -223,11 +238,15 @@ class Handle(paramiko.client.SSHClient):
         self.logger = logger
         host = kwargs.get('host')
         user = kwargs.get('user')
-        ssh_key_file = kwargs.get('ssh_key_file')
+        ssh_key_file = kwargs.get('ssh_key_file', None)
+        password = kwargs.get('password', None)
         try:
             super(Handle, self).__init__()
             self.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            self.connect(hostname=host, username=user, key_filename=ssh_key_file)
+            if ssh_key_file:
+                self.connect(hostname=host, username=user, key_filename=ssh_key_file)
+            else:
+                self.connect(hostname=host, username=user, password=password)
             ssh_h = self.invoke_shell(width=160)
             self.client = ssh_h
             all_data = []
