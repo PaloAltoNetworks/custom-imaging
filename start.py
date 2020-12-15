@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from lib.script_logger import Logger
-from lib.utils import CustomAmi
+from lib.utils import CustomImage
 
 
 CONFIG_FILE = "config.yaml"
@@ -21,10 +21,10 @@ CONFIG_FILE = "config.yaml"
 
 def main():
 
-    # Custom AMI library Initialization
-    lib = CustomAmi(logger, 'aws', CONFIG_FILE)
+    # Custom Image library Initialization
+    lib = CustomImage(logger, CONFIG_FILE)
 
-    # Create a base Instance(EC2)
+    # Create a base Instance
     lib.cloud_client.create_instance()
 
     try:
@@ -56,30 +56,30 @@ def main():
         lib.upgrade_panos()
 
         # Verify Upgrades
-        lib.verify_upgrades()
+        lib.verify_upgrades(when="before")
 
         # Perform Private Data Reset
         lib.private_data_reset()
 
         # Verify Upgrades after Private Data Reset
-        lib.verify_upgrades()
+        lib.verify_upgrades(when="after")
 
         # Close connection to the Firewall
         lib.handler.close()
 
-        # Create Custom AMI
-        lib.create_custom_ami()
+        # Create Custom Image
+        lib.create_custom_image()
 
-        # Cleanup
+        # # Cleanup
         logger.info('*** Terminating Base Instance ***')
         lib.cloud_client.terminate_instance()
         logger.info('*** Termination Complete ***')
 
     except Exception as e:
         # Failed
-        logger.error(f'*** Failed to Create Custom AMI ***')
+        logger.error(f'*** Failed to Create Custom Image ***')
         logger.error(f'TRACEBACK: {str(e)}')
-        # Terminating created Instance(EC2)
+        # Terminating created Instance
         logger.info('*** Terminating Base Instance ***')
         lib.cloud_client.terminate_instance()
         logger.info('*** Termination Complete ***')
@@ -87,6 +87,6 @@ def main():
 
 if __name__ == '__main__':
     # Setup Logger
-    logger = Logger(console=True)
-    # Create Custom AMI
+    logger = Logger(console=True, level='DEBUG')
+    # Create Custom Image
     main()

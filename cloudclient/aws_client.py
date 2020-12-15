@@ -40,6 +40,8 @@ class CloudAws(object):
             logger.info('Connection Successful.')
         except Exception as e:
             logger.error(f'Unable to connect to AWS: {str(e)}')
+        self.config["username"] = "admin"
+        self.config["pkey"] = config["pkey"]
         self.instance_id = ""
         self.public_ip = ""
 

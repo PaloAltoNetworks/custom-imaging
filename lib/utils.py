@@ -22,14 +22,14 @@ FIRST_WAIT = 660
 INTERVAL = 120
 
 
-class CustomAmi(object):
-    def __init__(self, logger, cloud_provider, filename):
+class CustomImage(object):
+    def __init__(self, logger, filename):
         self.logger = logger
         self.config = {}
         # Fetch Inputs From Config File
         self.config = self.fetch_config_yaml(filename)
         # Connect to the public Cloud
-        self.cloud_client = CloudProvider(self.logger, cloud_provider, self.config)
+        self.cloud_client = CloudProvider(self.logger, self.config["cloud_provider"], self.config)
         self.handler =None
 
     def fetch_config_yaml(self, filename):
@@ -40,16 +40,29 @@ class CustomAmi(object):
             self.logger.error(f'Unable to read configuration file {filename}.')
         output = {}
         try:
-            output['ami_id'] = config['ami-id']
-            output['mgmt_subnet_id'] = config['mgmt-subnet-id']
-            output['sg_id'] = config['sg-id']
-            output['key_pair_name'] = config['key-pair-name']
-            output['instance_type'] = config['instance-type']
+            if config["cloud-provider"].lower() == "aws":
+                output['ami_id'] = config['ami-id']
+                output['mgmt_subnet_id'] = config['mgmt-subnet-id']
+                output['sg_id'] = config['sg-id']
+                output['key_pair_name'] = config['key-pair-name']
+                output['instance_type'] = config['instance-type']
 
-            output['aws_access_key_id'] = config['secret-key-id']
-            output['aws_secret_access_key'] = config['secret-access-key']
-            output['region'] = config['region']
-            output['pkey'] = config['instance-pkey']
+                output['aws_access_key_id'] = config['secret-key-id']
+                output['aws_secret_access_key'] = config['secret-access-key']
+                output['region'] = config['region']
+                output['pkey'] = config['instance-pkey']
+
+            elif config["cloud-provider"].lower() == "azure":
+                output['subscription_id'] = config['subscription-id']
+                output['tenant_id'] = config['tenant-id']
+                output['client_id'] = config['client-id']
+                output['client_secret'] = config['client-secret']
+                output['location'] = config['location']
+                output['rg_name'] = config['rg-name']
+                output['vm_size'] = config['vm-size']
+                output['nic_id'] = config['nic-id']
+                output['image_sku'] = config['image-sku']
+                output['image_version'] = config['image-version']
 
             output['plugin'] = config.get('vm-series-plugin-version', False)
             output['content_upgrade'] = config.get('content-upgrade', False)
@@ -60,9 +73,10 @@ class CustomAmi(object):
             output['auth_code'] = config.get('auth-code', False)
             output['sw_version'] = config['software-version']
             output['version'] = output['sw_version'].split('vm-')[1]
+            output['cloud_provider'] = config["cloud-provider"].lower()
         except Exception as e:
             self.logger.error(f'Configuration file {filename} is broken. {str(e)}')
-        self.logger.info(f'*** Custom AMI with the following versions will be created: ***')
+        self.logger.info(f'*** Custom Image with the following versions will be created: ***')
         self.logger.info(f'PanOS: {output["sw_version"]}')
         self.logger.info(f'Plugin: {output["plugin"]}')
         self.logger.info(f'Latest Content: {output["content_upgrade"]}')
@@ -74,11 +88,15 @@ class CustomAmi(object):
     def connect_to_vmseries(self):
         tries = 6
         host = self.cloud_client.public_ip
-        #host = '54.183.114.228'
-        user = 'admin'
-        pkey = self.config['pkey']
         try:
-            handler = PanosDevice(self.logger, host=host, user=user, ssh_key_file=pkey)
+            if self.config['cloud_provider'] == 'aws':
+                handler = PanosDevice(self.logger, host=host,
+                                      user=self.cloud_client.config["username"],
+                                      ssh_key_file=self.cloud_client.config["pkey"])
+            elif self.config['cloud_provider'] == 'azure':
+                handler = PanosDevice(self.logger, host=host,
+                                      user=self.cloud_client.config["username"],
+                                      password=self.cloud_client.config["password"])
         except Exception as e:
             self.logger.info(f'{e}')
             self.logger.info(f'Device not ready. Waiting {FIRST_WAIT}s for device to boot...')
@@ -86,7 +104,14 @@ class CustomAmi(object):
             while tries != 0:
                 handler = None
                 try:
-                    handler = PanosDevice(self.logger, host=host, user=user, ssh_key_file=pkey)
+                    if self.config['cloud_provider'] == 'aws':
+                        handler = PanosDevice(self.logger, host=host,
+                                              user=self.cloud_client.config["username"],
+                                              ssh_key_file=self.cloud_client.config["pkey"])
+                    elif self.config['cloud_provider'] == 'azure':
+                        handler = PanosDevice(self.logger, host=host,
+                                              user=self.cloud_client.config["username"],
+                                              password=self.cloud_client.config["password"])
                     break
                 except:
                     self.logger.info(f'Management Plane not Ready. Waiting {INTERVAL}s to retry...')
@@ -262,22 +287,25 @@ class CustomAmi(object):
         else:
             raise Exception('"software-version" config variable cannot be empty.')
 
-    def verify_upgrades(self):
-        self.handler.verify_versions(sw=self.config["version"],
-                                     plugin=self.config["plugin"])
+    def verify_upgrades(self, when="before"):
+        if self.config["cloud_provider"].lower() == "azure" and when == "after":
+            return
+        else:
+            self.handler.verify_versions(sw=self.config["version"],
+                                         plugin=self.config["plugin"])
 
     def private_data_reset(self):
         if self.config['api_key']:
             self.handler.delicense(self.config['api_key'])
         else:
             self.logger.info(f'*** De-licensing API Key not provided. Skipping De-licensing Step. ***')
-        self.handler.private_data_reset()
+        self.handler.private_data_reset(self.config["cloud_provider"])
 
-    def create_custom_ami(self):
+    def create_custom_image(self):
         self.logger.info(f'*** Stopping Instance ***')
         self.cloud_client.stop_instance()
         self.logger.info(f'*** Instance Stopped ***')
 
-        self.logger.info(f'*** Creating Custom AMI ***')
-        self.cloud_client.create_image(name=f'PanOS-{self.config["version"]}-CustomAMI')
-        self.logger.info(f'*** Custom AMI Creation Complete ***')
+        self.logger.info(f'*** Creating Custom Image ***')
+        self.cloud_client.create_image(name=f'PanOS-{self.config["version"]}-CustomImage')
+        self.logger.info(f'*** Custom Image Creation Complete ***')
