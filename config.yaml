@@ -22,6 +22,7 @@ key-pair-name: 'key-pair-name'
 instance-pkey: '/path/to/directory/customami/private_key.pem'
 kms-key-id: ''
 ami-description: 'Custom Image created by Palo Alto Network'
+ip-type: public
 
 ########################################
 ############# AZURE CONFIG #############

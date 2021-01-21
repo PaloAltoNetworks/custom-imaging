@@ -63,7 +63,7 @@ class CloudAws(object):
         sg_id = self.config.get("sg_id")
         key_pair_name = self.config.get("key_pair_name")
         instance_type = self.config.get("instance_type", 'm5.xlarge')
-        ip_type = self.config.get("ip_type", 'public')
+        ip_type = self.config.get("ip-type", 'public')
 
         waiter = self.client.get_waiter('instance_running')
         self.logger.info(f'*** Creating Instance ***')
@@ -101,7 +101,7 @@ class CloudAws(object):
         except Exception as e:
             self.logger.error(f'ERROR: Unable to deploy the instance: {str(e)}')
         self.instance_id = instance_id
-        if ip_type == "private":
+        if ip_type == "public":
           self.ip = self._get_public_ip()
         else:
           self.ip = self._get_private_ip()
