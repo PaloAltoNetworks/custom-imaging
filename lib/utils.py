@@ -46,9 +46,11 @@ class CustomImage(object):
                 output['sg_id'] = config['sg-id']
                 output['key_pair_name'] = config['key-pair-name']
                 output['instance_type'] = config['instance-type']
-
+                output['kms_key_id'] = config['kms-key-id']
+                output['ami_description'] = config['ami-description']
                 output['aws_access_key_id'] = config['secret-key-id']
                 output['aws_secret_access_key'] = config['secret-access-key']
+                output['aws_session_token'] = config['secret-session-token']
                 output['region'] = config['region']
                 output['pkey'] = config['instance-pkey']
 
@@ -87,7 +89,7 @@ class CustomImage(object):
 
     def connect_to_vmseries(self):
         tries = 6
-        host = self.cloud_client.public_ip
+        host = self.cloud_client.ip
         try:
             if self.config['cloud_provider'] == 'aws':
                 handler = PanosDevice(self.logger, host=host,

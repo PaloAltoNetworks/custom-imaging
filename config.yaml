@@ -11,6 +11,7 @@ cloud-provider: ""                 # "azure"/"aws"/"gcp"
 
 secret-key-id: 'A***H'
 secret-access-key: 'B***3'
+secret-session-token: 'I***='
 region: 'us-west-1'
 
 ami-id: 'ami-xxxx'
@@ -19,6 +20,8 @@ sg-id: 'sg-xxxx'
 instance-type: 'm5.xlarge'
 key-pair-name: 'key-pair-name'
 instance-pkey: '/path/to/directory/customami/private_key.pem'
+kms-key-id: ''
+ami-description: 'Custom Image created by Palo Alto Network'
 
 ########################################
 ############# AZURE CONFIG #############
